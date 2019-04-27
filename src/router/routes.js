@@ -6,10 +6,14 @@ import NotFound from "@/pages/NotFoundPage.vue";
 import Dashboard from "@/pages/Dashboard.vue";
 import UserProfile from "@/pages/UserProfile.vue";
 import Notifications from "@/pages/Notifications.vue";
+import MemberManagement from "@/pages/MemberManagement.vue";
+import NodeManagement from "@/pages/NodeManagement.vue";
 import Icons from "@/pages/Icons.vue";
 import Maps from "@/pages/Maps.vue";
 import Typography from "@/pages/Typography.vue";
 import TableList from "@/pages/TableList.vue";
+
+import Login from "@/pages/Login.vue";
 
 const routes = [
   {
@@ -19,18 +23,28 @@ const routes = [
     children: [
       {
         path: "dashboard",
-        name: "dashboard",
+        name: "仪表盘",
         component: Dashboard
       },
       {
-        path: "stats",
-        name: "stats",
+        path: "profile",
+        name: "用户信息",
         component: UserProfile
       },
       {
         path: "notifications",
-        name: "notifications",
+        name: "提醒",
         component: Notifications
+      },
+      {
+        path: "members",
+        name: "用户管理",
+        component: MemberManagement
+      },
+      {
+        path: "nodes",
+        name: "节点管理",
+        component: NodeManagement
       },
       {
         path: "icons",
@@ -54,14 +68,15 @@ const routes = [
       }
     ]
   },
-  { path: "*", component: NotFound }
+  {path: "/login", component: Login},
+  {path: "*", component: NotFound}
 ];
 
 /**
  * Asynchronously load view (Webpack Lazy loading compatible)
  * The specified component must be inside the Views folder
  * @param  {string} name  the filename (basename) of the view to load.
-function view(name) {
+ function view(name) {
    var res= require('../components/Dashboard/Views/' + name + '.vue');
    return res;
 };**/

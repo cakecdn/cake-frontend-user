@@ -1,13 +1,18 @@
 <template>
   <card class="card-user">
     <div slot="image">
-      <img src="@/assets/img/background.jpg" alt="...">
+      <img src="@/assets/img/background.jpg" alt="..." />
     </div>
     <div>
       <div class="author">
-        <img class="avatar border-white" src="@/assets/img/faces/face-2.jpg" alt="...">
-        <h4 class="title">Chet Faker
-          <br>
+        <img
+          class="avatar border-white"
+          src="@/assets/img/faces/face-2.jpg"
+          alt="..."
+        />
+        <h4 class="title">
+          Chet Faker
+          <br />
           <a href="#">
             <small>@chetfaker</small>
           </a>
@@ -15,17 +20,23 @@
       </div>
       <p class="description text-center">
         "I like the way you work it
-        <br> No diggity
-        <br> I wanna bag it up"
+        <br />
+        No diggity <br />
+        I wanna bag it up"
       </p>
     </div>
-    <hr>
+    <hr />
     <div class="text-center">
       <div class="row">
-        <div v-for="(info, index) in details" :key="index" :class="getClasses(index)">
-          <h5>{{info.title}}
-            <br>
-            <small>{{info.subTitle}}</small>
+        <div
+          v-for="(info, index) in details"
+          :key="index"
+          :class="getClasses(index)"
+        >
+          <h5>
+            {{ info.title }}
+            <br />
+            <small>{{ info.subTitle }}</small>
           </h5>
         </div>
       </div>
@@ -66,5 +77,4 @@ export default {
   }
 };
 </script>
-<style>
-</style>
+<style></style>

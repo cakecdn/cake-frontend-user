@@ -1,0 +1,2 @@
+export const FETCH_PRODUCT = "FETCH_PRODUCT";
+export const WIZARD_USER_INFO = "WIZARD_USER_INFO";

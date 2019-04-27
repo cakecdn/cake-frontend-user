@@ -3,5 +3,9 @@
   "extends": [
     "plugin:vue/essential",
     "@vue/prettier"
-  ]
+  ],
+  "rules": {
+    "no-console": "warn",
+    "no-undef": "off"
+  }
 }
