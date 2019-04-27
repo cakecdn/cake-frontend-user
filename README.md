@@ -1,47 +1,25 @@
-# [Vue Paper Dashboard](https://cristijora.github.io/vue-paper-dashboard/)
+# CakeCDN Admin Frontend
 
-> Admin dashboard based on paper dashboard UI template + vue-router
+CakeCDN Admin module frontend project.
 
-This project is a vue version of [Paper-dashboard](https://www.creative-tim.com/product/paper-dashboard)
-designed for vue js.The dashboard includes vue-router
+## Introduction
 
-Check the [Live Demo here](https://cristijora.github.io/vue-paper-dashboard).
+CakeCDN Admin module frontend project Powered by [Vue.Js](https://github.com/vuejs/vue) and in use of the template [Vue Paper Dashboard](https://cristijora.github.io/vue-paper-dashboard/).
 
-[Nuxt Version (outdated Bootstrap 3)](https://github.com/cristijora/vue-paper-dashboard-nuxt)
-![](http://i.imgur.com/3iC1hOs.gif)
+## Dependencies
 
-## Documentation
-Link to [Documentation](http://vuejs.creative-tim.com/vue-paper-dashboard/documentation/)
+- [vue](https://github.com/vuejs/vue)
 
-## Build Setup
+- [vue-cli](https://github.com/vuejs/vue-cli)
 
-### install dependencies
-```
-npm install
-```
-### serve with hot reload at localhost:8080
-```
-npm run dev
-```
-### build for production with minification
-```
-npm run build
-```
-### lint
-```
-npm run lint
-```
-## Contribution guide
-* Fork the repository
-* `npm install` or `yarn install`
-* Make changes
-* Open Pull Request
+- [vuex](https://github.com/vuejs/vuex)
 
-For detailed explanation on how things work, checkout the [guide](https://github.com/vuejs/vue-cli/blob/dev/docs/README.md)
-- [CHANGELOG](./CHANGELOG.md)
-- [version-badge](https://img.shields.io/badge/version-2.0.0-blue.svg)
-- [license-badge](https://img.shields.io/badge/license-MIT-blue.svg)
+- [vue-router](https://github.com/vuejs/vue-router)
 
-## License
+- [Vue Paper Dashboard](https://cristijora.github.io/vue-paper-dashboard/)
 
-[MIT](https://github.com/cristijora/vue-paper-dashboard/blob/master/LICENSE.md)
+## Documents
+
+[Vue Paper Dashboard README.md](README_original_project.md)
+
+[Vue Paper Dashboard LICENSE](LICENSE_original_project)
