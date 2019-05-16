@@ -53,7 +53,7 @@
         </el-table-column>
         <el-table-column label="操作" width="150" fixed="right" align="center">
           <template slot-scope="scope">
-            <el-button size="mini">编辑</el-button>
+            <el-button size="mini" @click="editNode">编辑</el-button>
             <el-button type="danger" size="mini" @click="removeNode(scope.row)"
               >删除
             </el-button>
@@ -66,8 +66,8 @@
     <!--工具条-->
     <el-col :span="24" class="toolbar">
       <el-button type="primary" @click="addNode" icon="fa fa-plus"
-        >添加节点</el-button
-      >
+        >添加节点
+      </el-button>
       <el-button
         type="danger"
         @click="batchRemove"
@@ -86,9 +86,9 @@
       </el-pagination>
     </el-col>
 
-    <!-- 添加节点 -->
+    <!-- 节点标点 -->
     <el-dialog
-      title="添加新节点"
+      :title="formTitle"
       :visible.sync="formVisible"
       :close-on-click-modal="false"
       :modal-append-to-body="false"
@@ -134,7 +134,7 @@
 
 <script>
 import { mapGetters } from "vuex";
-import { listNodes } from "../../api/nodes";
+import { listNodes, addNode, editNode, deleteNode } from "../../api/nodes";
 
 export default {
   name: "NodeListTable",
@@ -156,24 +156,12 @@ export default {
         roles: [],
         status: 0
       },
+      isAdd: true,
       formRules: {
-        name: [
-          { required: true, message: "用户名不能为空。", trigger: "blur" },
-          {
-            pattern: "^[a-zA-Z]{1}[a-zA-Z0-9_]{5,16}$",
-            message:
-              "6-12个字符，包含大小写英文字母、数字和下划线，必须以大小写英文字母开头。",
-            trigger: "blur"
-          }
-        ]
+        name: [{ required: true, message: "节点名不能为空。", trigger: "blur" }]
       },
       formVisible: false,
-      formSubmitting: false,
-      roleOptions: [
-        { label: "管理员", value: "ROLE_ADMIN" },
-        { label: "客户专员", value: "ROLE_TENANT" },
-        { label: "注册用户", value: "ROLE_USER" }
-      ]
+      formSubmitting: false
     };
   },
   methods: {
@@ -194,10 +182,24 @@ export default {
     },
     addNode() {
       this.formVisible = true;
+      this.isAdd = true;
+    },
+    editNode() {
+      this.formVisible = true;
+      this.isAdd = false;
     },
     addSubmit() {},
     batchRemove() {},
-    removeNode(row) {},
+    removeNode(row) {
+      deleteNode([row.id])
+        .then(resp => {
+          this.$message.success("用户删除成功！");
+          this.listNodes();
+        })
+        .catch(err => {
+          this.$message.warning("用户删除失败：" + err);
+        });
+    },
     paging(val) {
       this.page = val;
       this.listNodes();
@@ -211,7 +213,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["currentUser"])
+    // ...mapGetters(["currentUser"]),
+    formTitle: function() {
+      return this.isAdd ? "添加节点" : "编辑节点";
+    }
   },
   mounted: function() {
     this.listNodes();
