@@ -6,7 +6,7 @@ import NotFound from "@/pages/NotFoundPage.vue";
 import Dashboard from "@/pages/Dashboard.vue";
 import UserProfile from "@/pages/UserProfile.vue";
 import Notifications from "@/pages/Notifications.vue";
-import MemberManagement from "@/pages/MemberManagement.vue";
+import UserManagement from "@/pages/UserManagement.vue";
 import NodeManagement from "@/pages/NodeManagement.vue";
 import Icons from "@/pages/Icons.vue";
 import Maps from "@/pages/Maps.vue";
@@ -39,7 +39,7 @@ const routes = [
       {
         path: "members",
         name: "用户管理",
-        component: MemberManagement
+        component: UserManagement
       },
       {
         path: "nodes",

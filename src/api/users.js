@@ -7,5 +7,13 @@ export const listUsers = params => {
 };
 
 export const addUser = body => {
-  return axios.post(`http://localhost:9002/users`, body).then(res => res.data);
+  return axios.post(`${host}/users`, body).then(res => res.data);
+};
+
+export const editUser = (body, path) => {
+  return axios.put(`${host}/users/${path[0]}`, body).then(res => res.data);
+};
+
+export const deleteUser = path => {
+  return axios.delete(`${host}/users/${path[0]}`).then(res => res.data);
 };

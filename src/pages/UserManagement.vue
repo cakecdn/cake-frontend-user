@@ -4,7 +4,7 @@
   </div>
 </template>
 <script>
-  import UserListTable from './MemberManagement/UserListTable'
+  import UserListTable from './UserManagement/UserListTable'
 
   export default {
     data: function () {

@@ -89,14 +89,19 @@
       </el-pagination>
     </el-col>
 
-    <!-- 添加用户 -->
+    <!-- 用户表单 -->
     <el-dialog
-      title="添加新用户"
+      :title="formTitle"
       :visible.sync="formVisible"
       :close-on-click-modal="false"
       :modal-append-to-body="false"
     >
-      <el-form :model="form" label-width="90px" :rules="formRules" ref="form">
+      <el-form
+        :model="form"
+        label-width="90px"
+        :rules="isAdd ? addRules : editRules"
+        ref="form"
+      >
         <el-form-item label="用户名" prop="username">
           <el-input v-model="form.username" auto-complete="off"></el-input>
         </el-form-item>
@@ -145,9 +150,9 @@
           </el-select>
         </el-form-item>
         <el-form-item label="状态" prop="status">
-          <el-select style="width:40%;" v-model="form.status">
-            <el-option label="启用" :value="1"></el-option>
-            <el-option label="禁用" :value="0"></el-option>
+          <el-select style="width:40%;" v-model="form.disabled">
+            <el-option label="启用" :value="false"></el-option>
+            <el-option label="禁用" :value="true"></el-option>
           </el-select>
         </el-form-item>
       </el-form>
@@ -155,7 +160,7 @@
         <el-button @click.native="formVisible = false">取消</el-button>
         <el-button
           type="primary"
-          @click.native="addSubmit"
+          @click.native="formSubmit"
           :loading="formSubmitting"
           >提交
         </el-button>
@@ -166,7 +171,7 @@
 
 <script>
 import { mapGetters } from "vuex";
-import { listUsers, addUser } from "../../api/users";
+import { listUsers, addUser, editUser, deleteUser } from "../../api/users";
 
 export default {
   name: "UserListTable",
@@ -186,10 +191,11 @@ export default {
         retypePassword: null,
         email: null,
         cellphone: null,
-        roles: [],
-        status: 0
+        roles: ["ROLE_USER"],
+        disabled: false
       },
-      formRules: {
+      isAdd: true,
+      addRules: {
         username: [
           { required: true, message: "用户名不能为空。", trigger: "blur" },
           {
@@ -239,12 +245,55 @@ export default {
           }
         ]
       },
+      editRules: {
+        username: [
+          { required: true, message: "用户名不能为空。", trigger: "blur" },
+          {
+            pattern: "^[a-zA-Z]{1}[a-zA-Z0-9_]{5,16}$",
+            message:
+              "6-12个字符，包含大小写英文字母、数字和下划线，必须以大小写英文字母开头。",
+            trigger: "blur"
+          }
+        ],
+        email: [
+          { required: true, message: "邮箱不能为空。", trigger: "blur" },
+          {
+            pattern:
+              "^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)*\\.[a-zA-Z0-9]{2,6}$",
+            message: "正确的邮箱格式示例：sample@cakecdn.net。",
+            trigger: "blur"
+          }
+        ],
+        cellphone: [
+          { required: true, message: "请输入手机号", trigger: "blur" },
+          {
+            pattern: "^1[0-9]{10}$",
+            message: "仅支持中国大陆地区11位手机号。",
+            trigger: "blur"
+          }
+        ],
+        roles: [
+          {
+            required: true,
+            message: "用户组不能为空。",
+            trigger: "change",
+            type: "array"
+          }
+        ],
+        status: [
+          {
+            required: true,
+            message: "请选择用户状态。",
+            trigger: "change"
+          }
+        ]
+      },
       formVisible: false,
       formSubmitting: false,
       roleOptions: [
-        { label: "管理员", value: "ROLE_ADMIN" },
+        { label: "注册用户", value: "ROLE_USER" },
         { label: "客户专员", value: "ROLE_TENANT" },
-        { label: "注册用户", value: "ROLE_USER" }
+        { label: "管理员", value: "ROLE_ADMIN" }
       ]
     };
   },
@@ -299,42 +348,78 @@ export default {
       return role;
     },
     addUser() {
+      this.form = {
+        username: null,
+        password: null,
+        retypePassword: null,
+        email: null,
+        cellphone: null,
+        roles: ["ROLE_USER"],
+        status: 0
+      };
+      this.isAdd = true;
       this.formVisible = true;
     },
-    addSubmit() {
-      addUser(this.form)
-        .then(resp => {
-          this.formVisible = false;
-          this.$message.success("用户添加成功！");
-          this.listUsers();
-        })
-        .catch(error => {
-          this.formVisible = false;
-          this.$message.error("用户添加失败：" + error);
-          if (error.response) {
-            // The request was made and the server responded with a status code
-            // that falls out of the range of 2xx
-            console.log(error.response.data);
-            console.log(error.response.status);
-            console.log(error.response.headers);
-          } else if (error.request) {
-            // The request was made but no response was received
-            // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-            // http.ClientRequest in node.js
-            console.log(error.request);
-          } else {
-            // Something happened in setting up the request that triggered an Error
-            console.log("Error", error.message);
-          }
-          console.log(error.config);
-        });
+    formSubmit() {
+      if (this.isAdd) {
+        addUser(this.form)
+          .then(resp => {
+            this.formVisible = false;
+            this.$message.success("用户添加成功！");
+            this.listUsers();
+          })
+          .catch(error => {
+            this.formVisible = false;
+            this.$message.error("用户添加失败：" + error);
+            if (error.response) {
+              // The request was made and the server responded with a status code
+              // that falls out of the range of 2xx
+              console.log(error.response.data);
+              console.log(error.response.status);
+              console.log(error.response.headers);
+            } else if (error.request) {
+              // The request was made but no response was received
+              // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+              // http.ClientRequest in node.js
+              console.log(error.request);
+            } else {
+              // Something happened in setting up the request that triggered an Error
+              console.log("Error", error.message);
+            }
+            console.log(error.config);
+          });
+      } else {
+        console.log(this.form);
+        editUser(this.form, [this.form.id])
+          .then(resp => {
+            this.formVisible = false;
+            this.$message.success("用户修改成功！");
+            this.listUsers();
+          })
+          .catch(err => {
+            this.$message.warning("用户修改失败：" + err);
+          });
+      }
     },
-    editUser(row) {},
+    editUser(row) {
+      this.formVisible = true;
+      this.form = JSON.parse(JSON.stringify(row));
+      this.isAdd = false;
+    },
     batchRemove() {},
     removeUser(row) {
       if (this.currentUser.name === row.username) {
         this.$message.warning("不允许删除当前登录的管理员用户！");
+        return;
       }
+      deleteUser([row.id])
+        .then(resp => {
+          this.$message.success("用户删除成功！");
+          this.listUsers();
+        })
+        .catch(err => {
+          this.$message.error("用户删除失败：" + err);
+        });
     },
     paging(val) {
       this.page = val;
@@ -345,7 +430,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["currentUser"])
+    ...mapGetters(["currentUser"]),
+    formTitle: function() {
+      return this.isAdd ? "添加用户" : "编辑用户";
+    }
   },
   mounted: function() {
     this.listUsers();
