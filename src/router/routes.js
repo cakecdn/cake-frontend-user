@@ -8,6 +8,7 @@ import UserProfile from "@/pages/UserProfile.vue";
 import Notifications from "@/pages/Notifications.vue";
 import UserManagement from "@/pages/UserManagement.vue";
 import NodeManagement from "@/pages/NodeManagement.vue";
+import CodeManagement from "@/pages/CodeManagement.vue";
 import Icons from "@/pages/Icons.vue";
 import Maps from "@/pages/Maps.vue";
 import Typography from "@/pages/Typography.vue";
@@ -45,6 +46,11 @@ const routes = [
         path: "nodes",
         name: "节点管理",
         component: NodeManagement
+      },
+      {
+        path: "codes",
+        name: "充值码管理",
+        component: CodeManagement
       },
       {
         path: "icons",
