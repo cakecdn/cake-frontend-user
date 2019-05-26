@@ -27,7 +27,7 @@
     </div>
 
     <!--Charts-->
-    <div class="row">
+    <!--<div class="row">
       <div class="col-12">
         <chart-card
           title="请求频度"
@@ -45,42 +45,7 @@
           </div>
         </chart-card>
       </div>
-
-      <!--<div class="col-md-6 col-12">
-        <chart-card
-          title="Email Statistics"
-          sub-title="Last campaign performance"
-          :chart-data="preferencesChart.data"
-          chart-type="Pie"
-        >
-          <span slot="footer">
-            <i class="ti-timer"></i> Campaign set 2 days ago</span
-          >
-          <div slot="legend">
-            <i class="fa fa-circle text-info"></i> Open
-            <i class="fa fa-circle text-danger"></i> Bounce
-            <i class="fa fa-circle text-warning"></i> Unsubscribe
-          </div>
-        </chart-card>
-      </div>
-
-      <div class="col-md-6 col-12">
-        <chart-card
-          title="2015 Sales"
-          sub-title="All products including Taxes"
-          :chart-data="activityChart.data"
-          :chart-options="activityChart.options"
-        >
-          <span slot="footer">
-            <i class="ti-check"></i> Data information certified
-          </span>
-          <div slot="legend">
-            <i class="fa fa-circle text-info"></i> Tesla Model S
-            <i class="fa fa-circle text-warning"></i> BMW 5 Series
-          </div>
-        </chart-card>
-      </div>-->
-    </div>
+    </div>-->
   </div>
 </template>
 <script>
@@ -99,33 +64,17 @@ export default {
         {
           type: "warning",
           icon: "ti-server",
-          title: "总流量",
-          value: "4.69 TB",
+          title: "已用流量",
+          value: "0.33 GB",
           footerText: "刚刚刷新",
           footerIcon: "ti-reload"
         },
         {
           type: "success",
-          icon: "ti-wallet",
-          title: "充值营收",
-          value: "￥0",
-          footerText: "本月",
-          footerIcon: "ti-calendar"
-        },
-        {
-          type: "danger",
-          icon: "ti-pulse",
-          title: "异常节点",
-          value: "2",
-          footerText: "24小时内",
-          footerIcon: "ti-timer"
-        },
-        {
-          type: "info",
-          icon: "ti-user",
-          title: "注册用户",
-          value: "+1",
-          footerText: "本月",
+          icon: "ti-server",
+          title: "剩余流量",
+          value: "4.69 TB",
+          footerText: "刚刚刷新",
           footerIcon: "ti-reload"
         }
       ],

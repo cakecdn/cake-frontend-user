@@ -1,39 +1,30 @@
 <template>
-  <card title="用户管理" class="col-12">
+  <card title="文件管理" class="col-12">
     <div class="col-xl-12 col-lg-12 col-md-12">
       <el-table
-        :data="users"
+        :data="files"
         style="width: 100%"
         @selection-change="selecting"
-        v-loading="usersListLoading"
+        v-loading="fileListLoading"
       >
         <el-table-column type="selection" min-width="30"></el-table-column>
-        <el-table-column prop="id" label="uid" align="center" min-width="50">
-        </el-table-column>
         <el-table-column
-          prop="username"
-          label="用户名"
-          align="center"
-          min-width="150"
+          prop="name"
+          label="文件名"
+          align="left"
+          min-width="500"
         >
         </el-table-column>
         <el-table-column
-          prop="email"
-          label="邮箱"
+          prop="sizeBytes"
+          label="文件大小"
           align="center"
-          min-width="250"
-        >
-        </el-table-column>
-        <el-table-column
-          prop="cellphone"
-          label="手机"
-          align="center"
-          min-width="120"
+          min-width="100"
         >
         </el-table-column>
         <el-table-column
           prop="created"
-          label="创建时间"
+          label="最后修改时间"
           align="center"
           min-width="200"
           default="0"
@@ -41,15 +32,6 @@
           :formatter="dateFormat"
         >
         </el-table-column>
-        <el-table-column
-          prop="roles"
-          label="用户组"
-          align="center"
-          default="0"
-          min-width="200"
-          type="date"
-          :formatter="roleFormat"
-        ></el-table-column>
         <el-table-column
           label="操作"
           min-width="150"
@@ -70,12 +52,12 @@
     <!--工具条-->
     <el-col :span="24" class="toolbar">
       <el-button type="primary" @click="addUser" icon="fa fa-plus"
-        >添加用户
+        >上传文件
       </el-button>
       <el-button
         type="danger"
         @click="batchRemove"
-        :disabled="this.usersSelected.length === 0"
+        :disabled="this.filesSelected.length === 0"
         icon="fa fa-trash"
         >批量删除
       </el-button>
@@ -89,81 +71,15 @@
       </el-pagination>
     </el-col>
 
-    <!-- 用户表单 -->
+    <!-- 文件表单 -->
     <el-dialog
       :title="formTitle"
       :visible.sync="formVisible"
       :close-on-click-modal="false"
       :modal-append-to-body="false"
     >
-      <el-form
-        :model="form"
-        label-width="90px"
-        :rules="isAdd ? addRules : editRules"
-        ref="form"
-      >
-        <el-form-item label="用户名" prop="username">
-          <el-input v-model="form.username" auto-complete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input
-            v-model="form.password"
-            auto-complete="off"
-            type="password"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="密码确认" prop="retypePassword">
-          <el-input
-            v-model="form.retypePassword"
-            auto-complete="off"
-            type="password"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="邮箱" prop="email">
-          <el-input
-            v-model="form.email"
-            auto-complete="off"
-            type="email"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="手机" prop="cellphone">
-          <el-input
-            v-model="form.cellphone"
-            auto-complete="off"
-            type="email"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="用户组" prop="roles">
-          <el-select
-            v-model="form.roles"
-            multiple
-            clearable
-            placeholder="请选择"
-          >
-            <el-option
-              v-for="item in roleOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            >
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="状态" prop="status">
-          <el-select style="width:40%;" v-model="form.disabled">
-            <el-option label="启用" :value="false"></el-option>
-            <el-option label="禁用" :value="true"></el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click.native="formVisible = false">取消</el-button>
-        <el-button
-          type="primary"
-          @click.native="formSubmit"
-          :loading="formSubmitting"
-          >提交
-        </el-button>
+        <el-button @click.native="formVisible = false">关闭</el-button>
       </div>
     </el-dialog>
   </card>
@@ -171,22 +87,22 @@
 
 <script>
 import { mapGetters } from "vuex";
-import { listUsers, addUser, editUser, deleteUser } from "../../api/users";
+import { listUsers, addUser, editUser, deleteUser } from "../../../api/users";
 
 export default {
   name: "UserListTable",
   data: function() {
     return {
-      users: [],
-      usersSelected: [],
-      usersListLoading: false,
+      files: [],
+      filesSelected: [],
+      fileListLoading: false,
       pager: {
         page: 1,
         size: 10,
         total: 0
       },
       form: {
-        username: null,
+        filename: null,
         password: null,
         retypePassword: null,
         email: null,
@@ -196,8 +112,8 @@ export default {
       },
       isAdd: true,
       addRules: {
-        username: [
-          { required: true, message: "用户名不能为空。", trigger: "blur" },
+        filename: [
+          { required: true, message: "文件名不能为空。", trigger: "blur" },
           {
             pattern: "^[a-zA-Z]{1}[a-zA-Z0-9_]{5,16}$",
             message:
@@ -232,7 +148,7 @@ export default {
         roles: [
           {
             required: true,
-            message: "用户组不能为空。",
+            message: "文件组不能为空。",
             trigger: "change",
             type: "array"
           }
@@ -240,14 +156,14 @@ export default {
         status: [
           {
             required: true,
-            message: "请选择用户状态。",
+            message: "请选择文件状态。",
             trigger: "change"
           }
         ]
       },
       editRules: {
-        username: [
-          { required: true, message: "用户名不能为空。", trigger: "blur" },
+        filename: [
+          { required: true, message: "文件名不能为空。", trigger: "blur" },
           {
             pattern: "^[a-zA-Z]{1}[a-zA-Z0-9_]{5,16}$",
             message:
@@ -275,7 +191,7 @@ export default {
         roles: [
           {
             required: true,
-            message: "用户组不能为空。",
+            message: "文件组不能为空。",
             trigger: "change",
             type: "array"
           }
@@ -283,7 +199,7 @@ export default {
         status: [
           {
             required: true,
-            message: "请选择用户状态。",
+            message: "请选择文件状态。",
             trigger: "change"
           }
         ]
@@ -291,7 +207,7 @@ export default {
       formVisible: false,
       formSubmitting: false,
       roleOptions: [
-        { label: "注册用户", value: "ROLE_USER" },
+        { label: "注册文件", value: "ROLE_USER" },
         { label: "客户专员", value: "ROLE_TENANT" },
         { label: "管理员", value: "ROLE_ADMIN" }
       ]
@@ -299,18 +215,18 @@ export default {
   },
   methods: {
     listUsers() {
-      this.usersListLoading = true;
+      this.fileListLoading = true;
       let params = {
         page: this.pager.page - 1,
         size: this.pager.size
       };
       listUsers(params)
         .then(resp => {
-          this.usersListLoading = false;
-          this.users = resp.data.list;
+          this.fileListLoading = false;
+          this.files = resp.data.list;
         })
-        .then(error => {
-          this.usersListLoading = false;
+        .catch(error => {
+          this.fileListLoading = false;
         });
     },
     dateFormat(row, column) {
@@ -339,7 +255,7 @@ export default {
             role += " " + "客户专员";
             break;
           case "ROLE_USER":
-            role += " " + "注册用户";
+            role += " " + "注册文件";
             break;
           default:
             role += " " + rolerc[i];
@@ -349,7 +265,7 @@ export default {
     },
     addUser() {
       this.form = {
-        username: null,
+        filename: null,
         password: null,
         retypePassword: null,
         email: null,
@@ -365,12 +281,12 @@ export default {
         addUser(this.form)
           .then(resp => {
             this.formVisible = false;
-            this.$message.success("用户添加成功！");
+            this.$message.success("文件上传成功！");
             this.listUsers();
           })
           .catch(error => {
             this.formVisible = false;
-            this.$message.error("用户添加失败：" + error);
+            this.$message.error("文件上传失败：" + error);
             if (error.response) {
               // The request was made and the server responded with a status code
               // that falls out of the range of 2xx
@@ -393,11 +309,11 @@ export default {
         editUser(this.form, [this.form.id])
           .then(resp => {
             this.formVisible = false;
-            this.$message.success("用户修改成功！");
+            this.$message.success("文件修改成功！");
             this.listUsers();
           })
           .catch(err => {
-            this.$message.warning("用户修改失败：" + err);
+            this.$message.warning("文件修改失败：" + err);
           });
       }
     },
@@ -408,17 +324,17 @@ export default {
     },
     batchRemove() {},
     removeUser(row) {
-      if (this.currentUser.name === row.username) {
-        this.$message.warning("不允许删除当前登录的管理员用户！");
+      if (this.currentUser.name === row.filename) {
+        this.$message.warning("不允许删除当前登录的管理员文件！");
         return;
       }
       deleteUser([row.id])
         .then(resp => {
-          this.$message.success("用户删除成功！");
+          this.$message.success("文件删除成功！");
           this.listUsers();
         })
         .catch(err => {
-          this.$message.error("用户删除失败：" + err);
+          this.$message.error("文件删除失败：" + err);
         });
     },
     paging(val) {
@@ -426,13 +342,13 @@ export default {
       this.listUsers();
     },
     selecting(sels) {
-      this.usersSelected = sels;
+      this.filesSelected = sels;
     }
   },
   computed: {
     ...mapGetters(["currentUser"]),
     formTitle: function() {
-      return this.isAdd ? "添加用户" : "编辑用户";
+      return this.isAdd ? "上传文件" : "编辑文件";
     }
   },
   mounted: function() {

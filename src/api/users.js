@@ -1,6 +1,6 @@
 import axios from "axios";
 
-let host = process.env.VUE_APP_API_BASE_URL + "/admin-endpoint";
+let host = process.env.VUE_APP_API_BASE_URL + "/user-endpoint";
 
 export const listUsers = params => {
   return axios.get(`${host}/users`, { params: params }).then(res => res.data);

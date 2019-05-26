@@ -2,11 +2,9 @@
   <div class="wrapper">
     <side-bar title="CakeCDN">
       <template slot="links">
-        <sidebar-link to="/dashboard" name="仪表盘" icon="ti-panel" />
-        <sidebar-link to="/members" name="用户管理" icon="ti-user" />
-        <sidebar-link to="/nodes" name="节点管理" icon="ti-server" />
-        <sidebar-link to="/codes" name="充值码管理" icon="ti-ticket" />
-        <sidebar-link to="/404" name="系统配置" icon="ti-settings" />
+        <sidebar-link to="/dashboard" name="首页" icon="ti-home" />
+        <sidebar-link to="/files" name="文件管理" icon="ti-folder" />
+        <sidebar-link to="/recharge" name="流量充值" icon="ti-package" />
       </template>
       <mobile-menu>
         <li class="nav-item">
