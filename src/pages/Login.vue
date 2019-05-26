@@ -12,7 +12,7 @@
           label-width="0px"
           class="demo-ruleForm login-container"
         >
-          <h3 class="title">CakeCDN 管理员登录</h3>
+          <h3 class="title">CakeCDN 登录</h3>
           <el-form-item prop="account">
             <el-input
               type="text"
@@ -110,7 +110,7 @@ export default {
                 } else if (group.includes("ROLE_USER")) {
                   groupName = "注册用户";
                 }
-                if (!group.includes("ROLE_ADMIN")) {
+                if (!group.includes("ROLE_USER")) {
                   this.$message({
                     message: "用户权限不足！",
                     type: "error"

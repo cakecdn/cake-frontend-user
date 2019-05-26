@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper">
-    <side-bar title="CakeCDN后台管理面板">
+    <side-bar title="CakeCDN">
       <template slot="links">
         <sidebar-link to="/dashboard" name="仪表盘" icon="ti-panel" />
         <sidebar-link to="/members" name="用户管理" icon="ti-user" />

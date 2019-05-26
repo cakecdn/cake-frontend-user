@@ -1,10 +1,10 @@
-# CakeCDN Admin Frontend
+# CakeCDN User Frontend
 
-CakeCDN Admin module frontend project.
+CakeCDN User module frontend project.
 
 ## Introduction
 
-CakeCDN Admin module frontend project Powered by [Vue.Js](https://github.com/vuejs/vue) and in use of the template [Vue Paper Dashboard](https://cristijora.github.io/vue-paper-dashboard/).
+CakeCDN User module frontend project Powered by [Vue.Js](https://github.com/vuejs/vue) and in use of the template [Vue Paper Dashboard](https://cristijora.github.io/vue-paper-dashboard/).
 
 ## Dependencies
 
