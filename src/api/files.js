@@ -8,3 +8,10 @@ export const listFiles = (host, userId, path) => {
     .then(res => res.data)
     .catch(error => error);
 };
+
+export const addFolder = (host, userId, path, body) => {
+  return axios
+    .post(`${host}/mkdir/${userId}/${path}`, body)
+    .then(res => res.data)
+    .catch(error => error);
+};

@@ -55,14 +55,14 @@
               size="mini"
               @click="editFile(scope.row)"
               v-if="scope.row.type !== 'PARENT_DIRECTORY'"
-            >编辑
+              >编辑
             </el-button>
             <el-button
               type="danger"
               size="mini"
               v-if="scope.row.type !== 'PARENT_DIRECTORY'"
               @click="removeFile(scope.row)"
-            >删除
+              >删除
             </el-button>
           </template>
         </el-table-column>
@@ -73,17 +73,17 @@
     <!--工具条-->
     <el-col :span="24" class="toolbar">
       <el-button type="primary" @click="addFile" icon="el-icon-upload2"
-      >&nbsp;&nbsp;上传文件
+        >&nbsp;&nbsp;上传文件
       </el-button>
       <el-button type="primary" @click="addFolder" icon="fa fa-folder"
-      >&nbsp;&nbsp;新建目录
+        >&nbsp;&nbsp;新建目录
       </el-button>
       <el-button
         type="danger"
         @click="batchRemove"
         :disabled="this.filesSelected.length === 0"
         icon="el-icon-delete"
-      >&nbsp;&nbsp;批量删除
+        >&nbsp;&nbsp;批量删除
       </el-button>
       <!--<el-pagination
         layout="prev, pager, next"
@@ -129,208 +129,235 @@
 </template>
 
 <script>
-  import {mapGetters} from "vuex";
-  import {listFiles} from "../../../api/files";
+import { mapGetters } from "vuex";
+import { listFiles, addFolder } from "../../../api/files";
 
-  export default {
-    name: "FileListTable",
-    data: function () {
-      return {
-        chosenFile: {},
-        directoryStack: [],
-        files: [],
-        filesSelected: [],
-        fileListLoading: false,
-        formVisible: false,
-        linkDialogVisible: false,
-        pager: {
-          page: 1,
-          size: 10,
-          total: 0
-        }
+export default {
+  name: "FileListTable",
+  data: function() {
+    return {
+      chosenFile: {},
+      directoryStack: [],
+      files: [],
+      filesSelected: [],
+      fileListLoading: false,
+      formVisible: false,
+      linkDialogVisible: false,
+      pager: {
+        page: 1,
+        size: 10,
+        total: 0
+      }
+    };
+  },
+  methods: {
+    listFiles() {
+      this.fileListLoading = true;
+      let params = {
+        page: this.pager.page - 1,
+        size: this.pager.size
       };
+      let url = this.node.downloadUrl;
+      let uid = this.currentUser.uid;
+      let dir = this.directory;
+      listFiles(url, uid, dir)
+        .then(resp => {
+          this.fileListLoading = false;
+          this.files = [];
+          if (this.directory !== "/") {
+            this.files.push({
+              name: "(上层目录)",
+              type: "PARENT_DIRECTORY"
+            });
+          }
+          this.files = this.files.concat(resp.data.paths);
+          this.files = this.files.concat(resp.data.files);
+        })
+        .catch(error => {
+          this.fileListLoading = false;
+        });
     },
-    methods: {
-      listFiles() {
-        this.fileListLoading = true;
-        let params = {
-          page: this.pager.page - 1,
-          size: this.pager.size
-        };
+    dateFormat(row, column) {
+      // row, column, cellValue, index
+      const daterc = row[column.property];
+      if (daterc != null) {
+        const dateMat = new Date(daterc);
+        const year = dateMat.getFullYear();
+        const month = dateMat.getMonth() + 1;
+        const day = dateMat.getDate();
+        const hh = dateMat.getHours();
+        const mm = dateMat.getMinutes();
+        const ss = dateMat.getSeconds();
+        return year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
+      }
+    },
+    fileSizeFormat(row, column) {
+      const fileSize = row[column.property];
+      let fileSizeStr = fileSize + "B";
+      if (fileSize > 1024) fileSizeStr = (fileSize / 1024).toFixed(2) + "KB";
+      if (fileSize > 1024 * 1024)
+        fileSizeStr = (fileSize / 1024 / 1024).toFixed(2) + "MB";
+      if (fileSize > 1024 * 1024 * 1024)
+        fileSizeStr = (fileSize / 1024 / 1024 / 1024).toFixed(2) + "GB";
+      if (typeof fileSize === "undefined") return "";
+      return fileSizeStr;
+    },
+    roleFormat(row, column) {
+      const rolerc = row[column.property];
+      let role = "";
+      for (let i in rolerc) {
+        switch (rolerc[i]) {
+          case "ROLE_ADMIN":
+            role += " " + "管理员";
+            break;
+          case "ROLE_TENANT":
+            role += " " + "客户专员";
+            break;
+          case "ROLE_USER":
+            role += " " + "注册文件";
+            break;
+          default:
+            role += " " + rolerc[i];
+        }
+      }
+      return role;
+    },
+    addFile() {
+      this.form = {
+        filename: null,
+        password: null,
+        retypePassword: null,
+        email: null,
+        cellphone: null,
+        roles: ["ROLE_USER"],
+        status: 0
+      };
+      this.isAdd = true;
+      this.formVisible = true;
+    },
+    addFolder() {
+      this.$prompt("请输入目录名", "添加目录", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        inputPattern: /^[^\\/:\\*\\?"<>|]{1,120}$/,
+        inputErrorMessage: "120个字符以内，不能含有：? * < > : | \\ /"
+      }).then(({ value }) => {
         let url = this.node.downloadUrl;
         let uid = this.currentUser.uid;
-        listFiles(url, uid, this.directory)
-          .then(resp => {
-            this.fileListLoading = false;
-            this.files = [];
-            if (this.directory !== "/") {
-              this.files.push({
-                name: "(上层目录)",
-                type: "PARENT_DIRECTORY"
-              });
-            }
-            this.files = this.files.concat(resp.data.paths);
-            this.files = this.files.concat(resp.data.files);
-          })
-          .catch(error => {
-            this.fileListLoading = false;
-          });
-      },
-      dateFormat(row, column) {
-        // row, column, cellValue, index
-        const daterc = row[column.property];
-        if (daterc != null) {
-          const dateMat = new Date(daterc);
-          const year = dateMat.getFullYear();
-          const month = dateMat.getMonth() + 1;
-          const day = dateMat.getDate();
-          const hh = dateMat.getHours();
-          const mm = dateMat.getMinutes();
-          const ss = dateMat.getSeconds();
-          return year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
-        }
-      },
-      fileSizeFormat(row, column) {
-        const fileSize = row[column.property];
-        let fileSizeStr = fileSize + "B";
-        if (fileSize > 1024) fileSizeStr = (fileSize / 1024).toFixed(2) + "KB";
-        if (fileSize > 1024 * 1024)
-          fileSizeStr = (fileSize / 1024 / 1024).toFixed(2) + "MB";
-        if (fileSize > 1024 * 1024 * 1024)
-          fileSizeStr = (fileSize / 1024 / 1024 / 1024).toFixed(2) + "GB";
-        if (typeof fileSize === "undefined") return "";
-        return fileSizeStr;
-      },
-      roleFormat(row, column) {
-        const rolerc = row[column.property];
-        let role = "";
-        for (let i in rolerc) {
-          switch (rolerc[i]) {
-            case "ROLE_ADMIN":
-              role += " " + "管理员";
-              break;
-            case "ROLE_TENANT":
-              role += " " + "客户专员";
-              break;
-            case "ROLE_USER":
-              role += " " + "注册文件";
-              break;
-            default:
-              role += " " + rolerc[i];
-          }
-        }
-        return role;
-      },
-      addFile() {
-        this.form = {
-          filename: null,
-          password: null,
-          retypePassword: null,
-          email: null,
-          cellphone: null,
-          roles: ["ROLE_USER"],
-          status: 0
+        let dir = this.directory;
+        let body = {
+          value: value
         };
-        this.isAdd = true;
-        this.formVisible = true;
-      },
-      addFolder() {
-      },
-      editFile(row) {
-        this.formVisible = true;
-        this.form = JSON.parse(JSON.stringify(row));
-        this.isAdd = false;
-      },
-      batchRemove() {
-      },
-      paging(val) {
-        this.page = val;
-        this.listFiles();
-      },
-      selecting(sels) {
-        this.filesSelected = sels;
-      },
-      contains(a, obj) {
-        let i = a.length;
-        while (i--) {
-          if (a[i] === obj) {
-            return i;
-          }
-        }
-        return false;
-      },
-      fileIcon(row) {
-        if (row.type === "DIRECTORY") return "fa fa-folder-o";
-        if (row.type === "PARENT_DIRECTORY") return "fa fa-level-up";
-        else return "fa fa-file-o";
-      },
-      fileLinkClick(row) {
-        if (row.type === "PARENT_DIRECTORY") {
-          this.directoryStack.pop();
-        } else if (row.type === "DIRECTORY") {
-          this.directoryStack.push(row.name);
-        } else if (row.type === "FILE") {
-          this.chosenFile = row;
-          this.linkDialogVisible = true;
-        }
-        this.listFiles();
-      },
-      queryPath(path) {
-        if (path.charAt(0) === "/") path = path.substr(1, path.length);
-        if (path.charAt(path.length - 1) === "/")
-          path = path.substr(0, path.length - 1);
-        return path;
-      },
-      copyUrl() {
-        let that = this;
-        this.$copyText(this.chosenFile.url).then(
-          function () {
-            that.$message.success("URL复制成功！");
-          },
-          function () {
-            that.$message.error("URL复制失败！");
-          }
-        );
-      },
-      browserOpen(url) {
-        window.open(url, '_blank');
-      }
+        addFolder(url, uid, dir, body)
+          .then(resp => {
+            this.$message({
+              type: "success",
+              message: "目录添加成功！"
+            });
+            this.listFiles();
+          })
+          .catch(err => {
+            this.$message({
+              type: "error",
+              message: "目录添加失败！"
+            });
+          });
+      });
     },
-    computed: {
-      ...mapGetters(["node", "currentUser"]),
-      formTitle: function () {
-        return this.isAdd ? "上传文件" : "编辑文件";
-      },
-      directory() {
-        let path = "/";
-        for (let i in this.directoryStack) {
-          if (this.directoryStack.hasOwnProperty(i)) {
-            path += this.directoryStack[i];
-          }
-        }
-        return path;
-      }
+    editFile(row) {
+      this.formVisible = true;
+      this.form = JSON.parse(JSON.stringify(row));
+      this.isAdd = false;
     },
-    mounted: function () {
-      let path = "/";
-      if (this.$route.query.hasOwnProperty("path")) {
-        path = path + this.$route.query.path;
-      }
-      path = this.queryPath(path);
-      this.directoryStack = path.split("/");
-      if (this.directoryStack[0] === "") this.directoryStack = [];
+    batchRemove() {},
+    paging(val) {
+      this.page = val;
       this.listFiles();
+    },
+    selecting(sels) {
+      this.filesSelected = sels;
+    },
+    contains(a, obj) {
+      let i = a.length;
+      while (i--) {
+        if (a[i] === obj) {
+          return i;
+        }
+      }
+      return false;
+    },
+    fileIcon(row) {
+      if (row.type === "DIRECTORY") return "fa fa-folder-o";
+      if (row.type === "PARENT_DIRECTORY") return "fa fa-level-up";
+      else return "fa fa-file-o";
+    },
+    fileLinkClick(row) {
+      if (row.type === "PARENT_DIRECTORY") {
+        this.directoryStack.pop();
+      } else if (row.type === "DIRECTORY") {
+        this.directoryStack.push(row.name);
+      } else if (row.type === "FILE") {
+        this.chosenFile = row;
+        this.linkDialogVisible = true;
+      }
+      this.listFiles();
+    },
+    queryPath(path) {
+      if (path.charAt(0) === "/") path = path.substr(1, path.length);
+      if (path.charAt(path.length - 1) === "/")
+        path = path.substr(0, path.length - 1);
+      return path;
+    },
+    copyUrl() {
+      let that = this;
+      this.$copyText(this.chosenFile.url).then(
+        function() {
+          that.$message.success("URL复制成功！");
+        },
+        function() {
+          that.$message.error("URL复制失败！");
+        }
+      );
+    },
+    browserOpen(url) {
+      window.open(url, "_blank");
     }
-  };
+  },
+  computed: {
+    ...mapGetters(["node", "currentUser"]),
+    formTitle: function() {
+      return this.isAdd ? "上传文件" : "编辑文件";
+    },
+    directory() {
+      let path = "/";
+      for (let i in this.directoryStack) {
+        if (this.directoryStack.hasOwnProperty(i)) {
+          path += this.directoryStack[i];
+        }
+      }
+      return path;
+    }
+  },
+  mounted: function() {
+    let path = "/";
+    if (this.$route.query.hasOwnProperty("path")) {
+      path = path + this.$route.query.path;
+    }
+    path = this.queryPath(path);
+    this.directoryStack = path.split("/");
+    if (this.directoryStack[0] === "") this.directoryStack = [];
+    this.listFiles();
+  }
+};
 </script>
 
 <style scoped lang="scss">
-  .toolbar {
-    padding: 10px;
-    //border:1px solid #dfe6ec;
-    margin: 10px 0;
-    .el-form-item {
-      margin-bottom: 10px;
-    }
+.toolbar {
+  padding: 10px;
+  //border:1px solid #dfe6ec;
+  margin: 10px 0;
+  .el-form-item {
+    margin-bottom: 10px;
   }
+}
 </style>
