@@ -8,4 +8,3 @@ export const listNodes = params => {
     .then(res => res.data)
     .catch(error => error);
 };
-

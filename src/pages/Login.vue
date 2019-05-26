@@ -92,15 +92,12 @@ export default {
                   type: "error"
                 });
               } else {
-                sessionStorage.setItem(
-                  "JSONWebToken",
-                  JSON.stringify(data)
-                );
+                sessionStorage.setItem("JSONWebToken", JSON.stringify(data));
                 let tokenBody = data.split(".")[1];
                 let userData = JSON.parse(Base64.decode(tokenBody));
+                let uid = userData.uid;
                 let name = userData.sub;
                 let group = userData.auth;
-                let wizard = userData.wizard;
                 let avatarUrl = userData.avatar;
                 let groupName = "非法用户";
                 if (group.includes("ROLE_ADMIN")) {
@@ -118,9 +115,9 @@ export default {
                   return;
                 }
                 this.$store.commit("loginInit", [
+                  uid,
                   name,
                   groupName,
-                  wizard,
                   avatarUrl
                 ]);
                 axios.defaults.headers.common["Authorization"] = data;

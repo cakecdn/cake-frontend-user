@@ -25,7 +25,7 @@
             <a
               class="dropdown-item"
               href="#"
-              v-if="endpoints.length == 0"
+              v-if="endpoints.length === 0"
               @click="clickEndpointMenu(item)"
               >无可用存储节点</a
             >
@@ -45,9 +45,11 @@
 </template>
 <script>
 import { listNodes } from "../../api/nodes";
+import { mapGetters } from "vuex";
 
 export default {
   computed: {
+    ...mapGetters(["node"]),
     routeName() {
       const { name } = this.$route;
       return this.capitalizeFirstLetter(name);
@@ -78,10 +80,11 @@ export default {
     },
     clickEndpointMenu(item) {
       this.selectedEndpoint = item.name;
+      this.$store.commit("setUrls", [item.downloadUrl, item.uploadUrl]);
     },
     endpointOmittedName(name) {
-      if (name.length > 6) {
-        return name.substr(0, 6) + "...";
+      if (name.length > 8) {
+        return name.substr(0, 8) + "...";
       }
     }
   },

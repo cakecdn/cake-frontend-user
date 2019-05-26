@@ -15,12 +15,12 @@ const routes = [
     redirect: "/dashboard",
     children: [
       {
-        path: "dashboard",
+        path: "/dashboard",
         name: "仪表盘",
         component: Dashboard
       },
       {
-        path: "files",
+        path: "/files",
         name: "文件管理",
         component: FileManagement
       }

@@ -6,7 +6,7 @@
         <sidebar-link to="/files" name="文件管理" icon="ti-folder" />
         <sidebar-link to="/recharge" name="流量充值" icon="ti-package" />
       </template>
-      <mobile-menu>
+      <!--<mobile-menu>
         <li class="nav-item">
           <a class="nav-link">
             <i class="ti-panel"></i>
@@ -34,7 +34,7 @@
           </a>
         </li>
         <li class="divider"></li>
-      </mobile-menu>
+      </mobile-menu>-->
     </side-bar>
     <div class="main-panel">
       <top-navbar></top-navbar>
