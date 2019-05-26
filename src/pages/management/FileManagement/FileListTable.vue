@@ -61,7 +61,7 @@
               type="danger"
               size="mini"
               v-if="scope.row.type !== 'PARENT_DIRECTORY'"
-              @click="removeFile(scope.row)"
+              @click="deleteFile(scope.row)"
               >删除
             </el-button>
           </template>
@@ -130,7 +130,7 @@
 
 <script>
 import { mapGetters } from "vuex";
-import { listFiles, addFolder } from "../../../api/files";
+import { listFiles, addFolder, deleteFileOrFolder } from "../../../api/files";
 
 export default {
   name: "FileListTable",
@@ -175,6 +175,19 @@ export default {
         })
         .catch(error => {
           this.fileListLoading = false;
+        });
+    },
+    deleteFile(row) {
+      let url = this.node.downloadUrl;
+      let uid = this.currentUser.uid;
+      let dir = this.directory + "/" + row.name;
+      deleteFileOrFolder(url, uid, dir)
+        .then(() => {
+          this.$message.success("删除成功！");
+          this.listFiles();
+        })
+        .catch(error => {
+          this.$message.error("删除失败：" + error);
         });
     },
     dateFormat(row, column) {

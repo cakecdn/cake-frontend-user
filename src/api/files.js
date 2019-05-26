@@ -15,3 +15,10 @@ export const addFolder = (host, userId, path, body) => {
     .then(res => res.data)
     .catch(error => error);
 };
+
+export const deleteFileOrFolder = (host, userId, path) => {
+  return axios
+    .delete(`${host}/${userId}/${path}`)
+    .then(res => res.data)
+    .catch(error => error);
+};
