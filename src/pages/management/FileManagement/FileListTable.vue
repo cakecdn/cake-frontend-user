@@ -72,7 +72,10 @@
 
     <!--工具条-->
     <el-col :span="24" class="toolbar">
-      <el-button type="primary" @click="addFile" icon="el-icon-upload2"
+      <el-button
+        type="primary"
+        @click.native="uploadVisible = true"
+        icon="el-icon-upload2"
         >&nbsp;&nbsp;上传文件
       </el-button>
       <el-button type="primary" @click="addFolder" icon="fa fa-folder"
@@ -104,6 +107,25 @@
     >
       <div slot="footer" class="dialog-footer">
         <el-button @click.native="formVisible = false">关闭</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog
+      title="上载文件"
+      :visible.sync="uploadVisible"
+      :close-on-click-modal="false"
+      :modal-append-to-body="false"
+      width="600px"
+    >
+      <div style="margin-left: 100px">
+        <el-upload class="upload-demo" drag :action="path" multiple>
+          <i class="el-icon-upload"></i>
+          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+          <div class="el-upload__tip" slot="tip">文件大小不得超过100M</div>
+        </el-upload>
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="closeUploadWindow">关闭</el-button>
       </div>
     </el-dialog>
 
@@ -143,6 +165,7 @@ export default {
       fileListLoading: false,
       formVisible: false,
       linkDialogVisible: false,
+      uploadVisible: false,
       pager: {
         page: 1,
         size: 10,
@@ -235,19 +258,6 @@ export default {
       }
       return role;
     },
-    addFile() {
-      this.form = {
-        filename: null,
-        password: null,
-        retypePassword: null,
-        email: null,
-        cellphone: null,
-        roles: ["ROLE_USER"],
-        status: 0
-      };
-      this.isAdd = true;
-      this.formVisible = true;
-    },
     addFolder() {
       this.$prompt("请输入目录名", "添加目录", {
         confirmButtonText: "确定",
@@ -300,7 +310,7 @@ export default {
       return false;
     },
     fileIcon(row) {
-      if (row.type === "DIRECTORY") return "fa fa-folder-o";
+      if (row.type === "DIRECTORY") return "fa fa-folder";
       if (row.type === "PARENT_DIRECTORY") return "fa fa-level-up";
       else return "fa fa-file-o";
     },
@@ -334,6 +344,10 @@ export default {
     },
     browserOpen(url) {
       window.open(url, "_blank");
+    },
+    closeUploadWindow() {
+      this.uploadVisible = false;
+      this.listFiles();
     }
   },
   computed: {
@@ -349,6 +363,11 @@ export default {
         }
       }
       return path;
+    },
+    path() {
+      return (
+        this.node.uploadUrl + "/" + this.currentUser.uid + "/" + this.directory
+      );
     }
   },
   mounted: function() {
