@@ -389,6 +389,7 @@ export default {
       for (let i in this.directoryStack) {
         if (this.directoryStack.hasOwnProperty(i)) {
           path += this.directoryStack[i];
+          path += "/";
         }
       }
       return path;
