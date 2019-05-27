@@ -52,6 +52,7 @@
 import { StatsCard, ChartCard } from "@/components/index";
 import Chartist from "chartist";
 import { mapGetters } from "vuex";
+import {fileSizeFormatter} from "../utils/formatter";
 
 export default {
   components: {
@@ -62,10 +63,18 @@ export default {
     return {
       statsCards: [
         {
+          type: "info",
+          icon: "ti-server",
+          title: "总流量",
+          value: "0 B",
+          footerText: "刚刚刷新",
+          footerIcon: "ti-reload"
+        },
+        {
           type: "warning",
           icon: "ti-server",
           title: "已用流量",
-          value: "0.33 GB",
+          value: "0 B",
           footerText: "刚刚刷新",
           footerIcon: "ti-reload"
         },
@@ -73,7 +82,7 @@ export default {
           type: "success",
           icon: "ti-server",
           title: "剩余流量",
-          value: "4.69 TB",
+          value: "0 B",
           footerText: "刚刚刷新",
           footerIcon: "ti-reload"
         }
@@ -150,9 +159,31 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["currentUser"])
+    ...mapGetters(["currentUser", "userProfile"])
   },
   mounted() {
+    this.listingTraffics();
+  },
+  methods: {
+    listingTraffics() {
+      console.log(this.userProfile);
+      if (
+        this.userProfile.hasOwnProperty("unusedTrafficBytes") &&
+        this.userProfile.hasOwnProperty("usedTrafficBytes")
+      )
+        this.statsCards[0].value = fileSizeFormatter(
+          this.userProfile.unusedTrafficBytes +
+            this.userProfile.usedTrafficBytes
+        );
+      if (this.userProfile.hasOwnProperty("usedTrafficBytes"))
+        this.statsCards[1].value = fileSizeFormatter(
+          this.userProfile.usedTrafficBytes
+        );
+      if (this.userProfile.hasOwnProperty("unusedTrafficBytes"))
+        this.statsCards[2].value = fileSizeFormatter(
+          this.userProfile.unusedTrafficBytes
+        );
+    }
   }
 };
 </script>

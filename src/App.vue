@@ -6,9 +6,22 @@
 </template>
 
 <script>
-  export default {
-    mounted: function() {}
-  };
+import { mapGetters, mapActions } from "vuex";
+
+export default {
+  methods: {
+    ...mapActions(["fetchUserProfiles"]),
+    getUserProfile() {
+      this.fetchUserProfiles();
+    }
+  },
+  computed: {
+    ...mapGetters(["currentUser", "userProfile"])
+  },
+  mounted: function() {
+    this.getUserProfile();
+  }
+};
 </script>
 
 <style lang="scss">

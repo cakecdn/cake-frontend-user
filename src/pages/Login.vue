@@ -95,10 +95,10 @@ export default {
                 sessionStorage.setItem("JSONWebToken", JSON.stringify(data));
                 let tokenBody = data.split(".")[1];
                 let userData = JSON.parse(Base64.decode(tokenBody));
-                let uid = userData.uid;
-                let name = userData.sub;
-                let group = userData.auth;
-                let avatarUrl = userData.avatar;
+                let uid = userData.sub.uid;
+                let name = userData.sub.username;
+                let group = userData.sub.auth;
+                let avatarUrl = userData.sub.avatar;
                 let groupName = "非法用户";
                 if (group.includes("ROLE_ADMIN")) {
                   groupName = "系统管理员";

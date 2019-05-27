@@ -1,7 +1,5 @@
-import products from "./products";
-import userInfo from "./userInfo";
+import userProfile from "./userProfile";
 
 export default {
-  products,
-  userInfo
+  userProfile
 };

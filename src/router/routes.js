@@ -5,6 +5,7 @@ import NotFound from "@/pages/NotFoundPage.vue";
 // Admin pages
 import Dashboard from "@/pages/Dashboard.vue";
 import FileManagement from "@/pages/management/FileManagement.vue";
+import RechargeManagement from "@/pages/management/RechargeManagement.vue";
 
 import Login from "@/pages/Login.vue";
 
@@ -23,6 +24,11 @@ const routes = [
         path: "/files",
         name: "文件管理",
         component: FileManagement
+      },
+      {
+        path: "/recharge",
+        name: "流量充值",
+        component: RechargeManagement
       }
     ]
   },

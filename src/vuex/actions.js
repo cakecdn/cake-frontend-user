@@ -12,11 +12,11 @@ export const fetchProduct = ({ commit }) => {
     });
 };
 
-export const fetchUserInfo = context => {
-  return services.userInfo
-    .getUserInfo()
+export const fetchUserProfiles = (context) => {
+  return services.userProfile
+    .getUserProfile()
     .then(response => {
-      context.commit(types.WIZARD_USER_INFO, response);
+      context.commit(types.FETCH_USER_PROFILE, response);
     })
     .catch(error => {
       console.error(error);
