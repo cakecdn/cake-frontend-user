@@ -98,18 +98,26 @@
       </el-pagination>-->
     </el-col>
 
-    <!-- 文件表单 -->
+    <!-- 文件修改窗口 -->
     <el-dialog
-      :title="formTitle"
-      :visible.sync="formVisible"
+      title="编辑文件"
+      :visible.sync="editDialogVisible"
       :close-on-click-modal="false"
       :modal-append-to-body="false"
     >
+      <el-form>
+        <el-form-item label="文件名称">
+          <el-input v-model="chosenFile.name">
+            <el-button slot="append" @click="saveFileName">保存</el-button>
+          </el-input>
+        </el-form-item>
+      </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click.native="formVisible = false">关闭</el-button>
+        <el-button @click.native="editDialogVisible = false">关闭</el-button>
       </div>
     </el-dialog>
 
+    <!-- 文件上传窗口 -->
     <el-dialog
       title="上载文件"
       :visible.sync="uploadVisible"
@@ -152,7 +160,12 @@
 
 <script>
 import { mapGetters } from "vuex";
-import { listFiles, addFolder, deleteFileOrFolder } from "../../../api/files";
+import {
+  listFiles,
+  addFolder,
+  deleteFileOrFolder,
+  rename
+} from "../../../api/files";
 
 export default {
   name: "FileListTable",
@@ -163,7 +176,7 @@ export default {
       files: [],
       filesSelected: [],
       fileListLoading: false,
-      formVisible: false,
+      editDialogVisible: false,
       linkDialogVisible: false,
       uploadVisible: false,
       pager: {
@@ -242,21 +255,40 @@ export default {
       const rolerc = row[column.property];
       let role = "";
       for (let i in rolerc) {
-        switch (rolerc[i]) {
-          case "ROLE_ADMIN":
-            role += " " + "管理员";
-            break;
-          case "ROLE_TENANT":
-            role += " " + "客户专员";
-            break;
-          case "ROLE_USER":
-            role += " " + "注册文件";
-            break;
-          default:
-            role += " " + rolerc[i];
+        if (rolerc.hasOwnProperty(i)) {
+          switch (rolerc[i]) {
+            case "ROLE_ADMIN":
+              role += " " + "管理员";
+              break;
+            case "ROLE_TENANT":
+              role += " " + "客户专员";
+              break;
+            case "ROLE_USER":
+              role += " " + "注册文件";
+              break;
+            default:
+              role += " " + rolerc[i];
+          }
         }
       }
       return role;
+    },
+    saveFileName() {
+      let body = {
+        src: this.chosenFile.oldFileName,
+        dst: this.chosenFile.name
+      };
+      let url = this.node.downloadUrl;
+      let uid = this.currentUser.uid;
+      let dir = this.directory;
+      rename(url, uid, dir, body)
+        .then(resp => {
+          this.$message.success("重命名成功！");
+          this.listFiles();
+        })
+        .catch(err => {
+          this.$message.error("重命名失败！");
+        });
     },
     addFolder() {
       this.$prompt("请输入目录名", "添加目录", {
@@ -288,9 +320,9 @@ export default {
       });
     },
     editFile(row) {
-      this.formVisible = true;
-      this.form = JSON.parse(JSON.stringify(row));
-      this.isAdd = false;
+      this.chosenFile = JSON.parse(JSON.stringify(row));
+      this.chosenFile.oldFileName = this.chosenFile.name;
+      this.editDialogVisible = true;
     },
     batchRemove() {},
     paging(val) {
@@ -320,7 +352,7 @@ export default {
       } else if (row.type === "DIRECTORY") {
         this.directoryStack.push(row.name);
       } else if (row.type === "FILE") {
-        this.chosenFile = row;
+        this.chosenFile = JSON.parse(JSON.stringify(row));
         this.linkDialogVisible = true;
       }
       this.listFiles();
@@ -352,9 +384,6 @@ export default {
   },
   computed: {
     ...mapGetters(["node", "currentUser"]),
-    formTitle: function() {
-      return this.isAdd ? "上传文件" : "编辑文件";
-    },
     directory() {
       let path = "/";
       for (let i in this.directoryStack) {

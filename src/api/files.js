@@ -16,6 +16,13 @@ export const addFolder = (host, userId, path, body) => {
     .catch(error => error);
 };
 
+export const rename = (host, userId, path, body) => {
+  return axios
+    .post(`${host}/rename/${userId}/${path}`, body)
+    .then(res => res.data)
+    .catch(error => error);
+};
+
 export const deleteFileOrFolder = (host, userId, path) => {
   return axios
     .delete(`${host}/${userId}/${path}`)
