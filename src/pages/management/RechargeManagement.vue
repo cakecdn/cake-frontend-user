@@ -66,7 +66,7 @@ export default {
     };
   },
   methods: {
-    ...mapActions(["fetchUserProfiles"]),
+    ...mapActions(["fetchUserTraffic"]),
     getRechargeCode() {
       this.disableUseButton = false;
       this.flag.show = false;
@@ -100,7 +100,7 @@ export default {
       useRechargeCode([this.rechargeCode])
         .then(resp => {
           this.$message.success("充值成功！");
-          this.fetchUserProfiles();
+          this.fetchUserTraffic();
           this.showInfo = false;
         })
         .catch(error=>{

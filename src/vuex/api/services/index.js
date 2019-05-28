@@ -1,5 +1,5 @@
-import userProfile from "./userProfile";
+import userTraffic from "./userTraffic";
 
 export default {
-  userProfile
+  userTraffic
 };

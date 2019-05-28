@@ -243,10 +243,10 @@ export default {
     fileSizeFormat(row, column) {
       const fileSize = row[column.property];
       let fileSizeStr = fileSize + "B";
-      if (fileSize > 1024) fileSizeStr = (fileSize / 1024).toFixed(2) + "KB";
-      if (fileSize > 1024 * 1024)
+      if (fileSize >= 1024) fileSizeStr = (fileSize / 1024).toFixed(2) + "KB";
+      if (fileSize >= 1024 * 1024)
         fileSizeStr = (fileSize / 1024 / 1024).toFixed(2) + "MB";
-      if (fileSize > 1024 * 1024 * 1024)
+      if (fileSize >= 1024 * 1024 * 1024)
         fileSizeStr = (fileSize / 1024 / 1024 / 1024).toFixed(2) + "GB";
       if (typeof fileSize === "undefined") return "";
       return fileSizeStr;

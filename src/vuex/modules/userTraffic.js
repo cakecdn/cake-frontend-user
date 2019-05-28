@@ -5,7 +5,7 @@ const state = {
 };
 
 const mutations = {
-  [types.FETCH_USER_PROFILE](state, $response) {
+  [types.FETCH_USER_TRAFFIC](state, $response) {
     state.main = $response.data;
   }
 };

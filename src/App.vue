@@ -10,13 +10,13 @@ import { mapGetters, mapActions } from "vuex";
 
 export default {
   methods: {
-    ...mapActions(["fetchUserProfiles"]),
+    ...mapActions(["fetchUserTraffic"]),
     getUserProfile() {
-      this.fetchUserProfiles();
+      this.fetchUserTraffic();
     }
   },
   computed: {
-    ...mapGetters(["currentUser", "userProfile"])
+    ...mapGetters(["currentUser", "userTraffic"])
   },
   mounted: function() {
     this.getUserProfile();

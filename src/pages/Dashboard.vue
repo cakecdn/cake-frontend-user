@@ -51,8 +51,8 @@
 <script>
 import { StatsCard, ChartCard } from "@/components/index";
 import Chartist from "chartist";
-import { mapGetters } from "vuex";
-import {fileSizeFormatter} from "../utils/formatter";
+import { mapGetters, mapActions } from "vuex";
+import { fileSizeFormatter } from "../utils/formatter";
 
 export default {
   components: {
@@ -62,22 +62,6 @@ export default {
   data() {
     return {
       statsCards: [
-        {
-          type: "info",
-          icon: "ti-server",
-          title: "总流量",
-          value: "0 B",
-          footerText: "刚刚刷新",
-          footerIcon: "ti-reload"
-        },
-        {
-          type: "warning",
-          icon: "ti-server",
-          title: "已用流量",
-          value: "0 B",
-          footerText: "刚刚刷新",
-          footerIcon: "ti-reload"
-        },
         {
           type: "success",
           icon: "ti-server",
@@ -159,29 +143,27 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["currentUser", "userProfile"])
+    ...mapGetters(["currentUser", "userTraffic"])
   },
   mounted() {
-    this.listingTraffics();
+    this.refreshTraffics();
   },
   methods: {
-    listingTraffics() {
-      console.log(this.userProfile);
-      if (
-        this.userProfile.hasOwnProperty("unusedTrafficBytes") &&
-        this.userProfile.hasOwnProperty("usedTrafficBytes")
-      )
+    ...mapActions(["fetchUserTraffic"]),
+    refreshTraffics() {
+      this.fetchUserTraffic()
+        .then(() => {
+          this.showTraffics();
+        })
+        .catch((err) => {
+          this.$message.error("流量获取失败！");
+          console.log(err);
+        });
+    },
+    showTraffics() {
+      if (this.userTraffic.hasOwnProperty("remainingTrafficBytes"))
         this.statsCards[0].value = fileSizeFormatter(
-          this.userProfile.unusedTrafficBytes +
-            this.userProfile.usedTrafficBytes
-        );
-      if (this.userProfile.hasOwnProperty("usedTrafficBytes"))
-        this.statsCards[1].value = fileSizeFormatter(
-          this.userProfile.usedTrafficBytes
-        );
-      if (this.userProfile.hasOwnProperty("unusedTrafficBytes"))
-        this.statsCards[2].value = fileSizeFormatter(
-          this.userProfile.unusedTrafficBytes
+          this.userTraffic.remainingTrafficBytes
         );
     }
   }
