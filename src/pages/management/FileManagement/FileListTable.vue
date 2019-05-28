@@ -126,7 +126,7 @@
       width="600px"
     >
       <div style="margin-left: 100px">
-        <el-upload class="upload-demo" drag :action="path" multiple>
+        <el-upload class="upload-demo" drag :action="path" multiple :headers="uploadHeaders">
           <i class="el-icon-upload"></i>
           <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
           <div class="el-upload__tip" slot="tip">文件大小不得超过100M</div>
@@ -183,6 +183,9 @@ export default {
         page: 1,
         size: 10,
         total: 0
+      },
+      uploadHeaders: {
+        Authorization: JSON.parse(sessionStorage.getItem("JSONWebToken"))
       }
     };
   },
