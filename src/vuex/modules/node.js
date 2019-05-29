@@ -1,5 +1,6 @@
 const state = {
   main: {
+    name: "",
     uploadUrl: "",
     downloadUrl: ""
   }
@@ -7,8 +8,9 @@ const state = {
 
 const mutations = {
   setUrls(state, $dataArr) {
-    state.main.uploadUrl = $dataArr[0];
-    state.main.downloadUrl = $dataArr[1];
+    state.main.name = $dataArr[0];
+    state.main.uploadUrl = $dataArr[1];
+    state.main.downloadUrl = $dataArr[2];
   }
 };
 

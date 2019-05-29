@@ -80,7 +80,11 @@ export default {
     },
     clickEndpointMenu(item) {
       this.selectedEndpoint = item.name;
-      this.$store.commit("setUrls", [item.downloadUrl, item.uploadUrl]);
+      this.$store.commit("setUrls", [
+        item.name,
+        item.downloadUrl,
+        item.uploadUrl
+      ]);
     },
     endpointOmittedName(name) {
       if (name.length > 8) {
