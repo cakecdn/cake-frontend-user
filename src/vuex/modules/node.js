@@ -2,15 +2,17 @@ const state = {
   main: {
     name: "",
     uploadUrl: "",
-    downloadUrl: ""
+    downloadUrl: "",
+    selections: []
   }
 };
 
 const mutations = {
-  setUrls(state, $dataArr) {
+  initNode(state, $dataArr) {
     state.main.name = $dataArr[0];
     state.main.uploadUrl = $dataArr[1];
     state.main.downloadUrl = $dataArr[2];
+    state.main.selections = $dataArr[3];
   }
 };
 

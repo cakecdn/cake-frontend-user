@@ -3,7 +3,7 @@
     <!--Stats cards-->
     <div class="row">
       <div
-        class="col-md-6 col-xl-3"
+        class="col-md-12 col-xl-4"
         v-for="stats in statsCards"
         :key="stats.title"
       >
@@ -19,7 +19,12 @@
             <p>{{ stats.title }}</p>
             {{ stats.value }}
           </div>
-          <div class="stats" slot="footer">
+          <div
+            class="stats"
+            slot="footer"
+            style="cursor: pointer"
+            @click="refreshTraffics"
+          >
             <i :class="stats.footerIcon"></i> {{ stats.footerText }}
           </div>
         </stats-card>
@@ -27,25 +32,23 @@
     </div>
 
     <!--Charts-->
-    <!--<div class="row">
-      <div class="col-12">
+    <div class="row">
+      <div class="col-12" v-if="refreshingTrafficChart">
         <chart-card
-          title="请求频度"
+          title="流量压力"
           sub-title="24 小时内"
-          :chart-data="usersChart.data"
-          :chart-options="usersChart.options"
+          :chart-data="trafficChart.data"
+          :chart-options="trafficChart.options"
         >
-          <span slot="footer">
-            <i class="ti-reload"></i> Updated 3 minutes ago
+          <span slot="footer" style="cursor: pointer" @click="refreshTrend"
+            ><i class="ti-reload"></i> 3 分钟前刷新
           </span>
           <div slot="legend">
-            <i class="fa fa-circle text-info"></i> 出口请求
-            <i class="fa fa-circle text-danger"></i> 入口请求
-            <i class="fa fa-circle text-warning"></i> 域内请求
+            <i class="fa fa-circle text-info"></i> 出口流量({{ trafficUnit }})
           </div>
         </chart-card>
       </div>
-    </div>-->
+    </div>
   </div>
 </template>
 <script>
@@ -53,6 +56,7 @@ import { StatsCard, ChartCard } from "@/components/index";
 import Chartist from "chartist";
 import { mapGetters, mapActions } from "vuex";
 import { fileSizeFormatter } from "../utils/formatter";
+import { getTrafficTrend } from "../api/traffic-trend";
 
 export default {
   components: {
@@ -64,34 +68,39 @@ export default {
       statsCards: [
         {
           type: "success",
-          icon: "ti-server",
+          icon: "fa fa-pie-chart",
           title: "剩余流量",
           value: "0 B",
           footerText: "刚刚刷新",
           footerIcon: "ti-reload"
+        },
+        {
+          type: "warning",
+          icon: "fa fa-area-chart",
+          title: "24小时内使用",
+          value: "0 B",
+          footerText: "刚刚刷新",
+          footerIcon: "ti-reload"
+        },
+        {
+          type: "danger",
+          icon: "fa fa-server",
+          title: "可用节点",
+          value: "0 个",
+          footerText: "刚刚刷新",
+          footerIcon: "ti-reload"
         }
       ],
-      usersChart: {
+      refreshingTrafficChart: true,
+      trafficUnit: "B",
+      trafficChart: {
         data: {
-          labels: [
-            "9:00AM",
-            "12:00AM",
-            "3:00PM",
-            "6:00PM",
-            "9:00PM",
-            "12:00PM",
-            "3:00AM",
-            "6:00AM"
-          ],
-          series: [
-            [287, 385, 90, 562, 191, 626, 524, 788, 101],
-            [67, 152, 82, 240, 150, 435, 535, 642, 50],
-            [23, 113, 67, 108, 140, 239, 307, 410, 40]
-          ]
+          labels: ["00:00", "01:00", "02:00", "03:00"],
+          series: [[5000, 101, 2008, 7453]]
         },
         options: {
           low: 0,
-          high: 1000,
+          high: 10000,
           showArea: true,
           height: "245px",
           axisX: {
@@ -103,61 +112,27 @@ export default {
           showLine: true,
           showPoint: false
         }
-      },
-      activityChart: {
-        data: {
-          labels: [
-            "Jan",
-            "Feb",
-            "Mar",
-            "Apr",
-            "Mai",
-            "Jun",
-            "Jul",
-            "Aug",
-            "Sep",
-            "Oct",
-            "Nov",
-            "Dec"
-          ],
-          series: [
-            [542, 543, 520, 680, 653, 753, 326, 434, 568, 610, 756, 895],
-            [230, 293, 380, 480, 503, 553, 600, 664, 698, 710, 736, 795]
-          ]
-        },
-        options: {
-          seriesBarDistance: 10,
-          axisX: {
-            showGrid: false
-          },
-          height: "245px"
-        }
-      },
-      preferencesChart: {
-        data: {
-          labels: ["62%", "32%", "6%"],
-          series: [62, 32, 6]
-        },
-        options: {}
       }
     };
   },
   computed: {
-    ...mapGetters(["currentUser", "userTraffic"])
+    ...mapGetters(["currentUser", "userTraffic", "node"])
   },
   mounted() {
     this.refreshTraffics();
+    this.refreshTrend();
+    this.statsCards[2].value = this.node.selections.length + " 个";
   },
   methods: {
     ...mapActions(["fetchUserTraffic"]),
     refreshTraffics() {
+      this.refreshTrend();
       this.fetchUserTraffic()
         .then(() => {
           this.showTraffics();
         })
-        .catch((err) => {
+        .catch(err => {
           this.$message.error("流量获取失败！");
-          console.log(err);
         });
     },
     showTraffics() {
@@ -165,6 +140,23 @@ export default {
         this.statsCards[0].value = fileSizeFormatter(
           this.userTraffic.remainingTrafficBytes
         );
+    },
+    refreshTrend() {
+      let userId = this.currentUser.uid;
+      this.refreshingTrafficChart = false;
+      getTrafficTrend([userId])
+        .then(resp => {
+          this.trafficChart.data.labels = resp.data.labels;
+          this.trafficChart.data.series[0] = resp.data.series;
+          this.trafficChart.options.low = resp.data.min;
+          this.trafficChart.options.high = resp.data.max;
+          this.refreshingTrafficChart = true;
+          this.trafficUnit = resp.data.trafficUnit;
+          this.statsCards[1].value = fileSizeFormatter(resp.data.totalBytes);
+        })
+        .catch(error => {
+          this.$message.error("流量记录获取失败！");
+        });
     }
   }
 };
